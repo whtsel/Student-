@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 # Expose the signing secrets as workflow-level env so their presence can be
 # tested in step `if:` conditions (the `secrets` context is not allowed
@@ -85,14 +86,13 @@ jobs:
           cat "$RUNNER_TEMP/analyze.log"
           exit "$status"
 
-      - name: Upload analyze log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: flutter-analyze-log
-          path: ${{ runner.temp }}/analyze.log
-          if-no-files-found: ignore
-          retention-days: 7
+      - name: Publish analyze log as issue
+        if: failure()
+        shell: bash
+        run: |
+          gh issue create \
+            --title "flutter analyze log (auto diagnostic)" \
+            --body-file "$RUNNER_TEMP/analyze.log" || true
 
       - name: Test
         run: flutter test
