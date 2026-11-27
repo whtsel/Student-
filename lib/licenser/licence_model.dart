@@ -250,7 +250,7 @@ class LicenceChecker {
       );
     }
 
-    final payloadMap = (payload as Map).cast<String, dynamic>();
+    final payloadMap = payload.cast<String, dynamic>();
     final Uint8List sigBytes;
     try {
       sigBytes = CoursePackCrypto.decodeBase64(signature);
