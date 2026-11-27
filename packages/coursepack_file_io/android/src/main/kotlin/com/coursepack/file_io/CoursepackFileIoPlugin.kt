@@ -92,39 +92,36 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, A
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when (call.method) {
-            "pickTextFile" -> {
-                pendingPick = result
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .putExtra(
-                        Intent.EXTRA_MIME_TYPES,
-                        arrayOf("text/*", "application/json", "application/octet-stream", "*/*"),
-                    )
-                pickLauncher?.launch(intent)
-                    ?: result.error("no_activity", "The file picker is not available yet.", null)
-            }
-
-            "saveTextFile" -> {
-                val filename = call.argument<String>("filename").orEmpty()
-                val text = call.argument<String>("text").orEmpty()
-                pendingSave = Pair(result, text)
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .putExtra(Intent.EXTRA_TITLE, filename)
-                    .putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("*/*"))
-                saveLauncher?.launch(intent)
-                    ?: result.error("no_activity", "The file saver is not available yet.", null)
-            }
-
-            else -> result.notImplemented(),
+        val method = call.method
+        if (method == "pickTextFile") {
+            pendingPick = result
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .putExtra(
+                    Intent.EXTRA_MIME_TYPES,
+                    arrayOf("text/*", "application/json", "application/octet-stream", "*/*"),
+                )
+            pickLauncher?.launch(intent)
+                ?: result.error("no_activity", "The file picker is not available yet.", null)
+        } else if (method == "saveTextFile") {
+            val filename = call.argument<String>("filename").orEmpty()
+            val text = call.argument<String>("text").orEmpty()
+            pendingSave = Pair(result, text)
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .putExtra(Intent.EXTRA_TITLE, filename)
+                .putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("*/*"))
+            saveLauncher?.launch(intent)
+                ?: result.error("no_activity", "The file saver is not available yet.", null)
+        } else {
+            result.notImplemented()
         }
     }
 
     private fun readText(uri: Uri): String {
         val current = activity ?: throw FileNotFoundException("No activity to read from.")
         return current.contentResolver.openInputStream(uri)
-            ?.use { it.buffered().readText() }
+            ?.use { String(it.buffered().readBytes(), Charsets.UTF_8) }
             ?: throw FileNotFoundException("Cannot read $uri.")
     }
 
