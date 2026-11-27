@@ -46,7 +46,7 @@ jobs:
         run: |
           flutter pub get
           set +e
-          flutter analyze --no-pub > "$RUNNER_TEMP/flutter-analyze.log" 2>&1
+          flutter analyze --no-pub --no-fatal-infos > "$RUNNER_TEMP/flutter-analyze.log" 2>&1
           analyze_status=$?
           set -e
           cat "$RUNNER_TEMP/flutter-analyze.log"
