@@ -3,9 +3,11 @@ package com.coursepack.file_io
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.FileNotFoundException
@@ -16,7 +18,7 @@ import java.io.FileNotFoundException
  * required: the user picks a document provider and the app reads or writes
  * through the returned [Uri] with the [android.content.ContentResolver].
  */
-class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
+class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
     private lateinit var channel: MethodChannel
     private var activity: Activity? = null
@@ -48,6 +50,7 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private fun attachActivity() {
         val current = activity ?: return
+        if (current !is ComponentActivity) return
         if (pickLauncher == null) {
             pickLauncher = current.registerForActivityResult(
                 ActivityResultContracts.StartActivityForResult(),
