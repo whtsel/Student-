@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.FileNotFoundException
@@ -39,12 +40,21 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, A
         channel.setMethodCallHandler(null)
     }
 
-    override fun onAttachedToActivity(activity: Activity) {
-        this.activity = activity
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
         attachActivity()
     }
 
     override fun onDetachedFromActivity() {
+        activity = null
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        this.activity = binding.activity
+        attachActivity()
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
         activity = null
     }
 
