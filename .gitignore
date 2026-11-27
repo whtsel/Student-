@@ -1,0 +1,34 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# Platform-specific generated state
+android/local.properties
+android/key.properties
+android/.gradle/
+windows/flutter/ephemeral/
+
+# CoursePack secrets and paid-course content (never commit)
+secrets/
+keys/
+licenses/
+*.jks
+*.keystore
+*.lic
+*.enc
+# Synthetic vectors are permitted only as tests, never course material.
+!test/fixtures/*.enc
+course_keys.json
+raw/
+dist/
+
+# Python tooling
+__pycache__/
+*.py[cod]
+.venv/

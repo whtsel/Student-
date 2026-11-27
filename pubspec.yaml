@@ -1,0 +1,21 @@
+name: coursepack
+description: An offline video course player for Android and Windows.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cryptography: ^2.7.0
+  coursepack_device_identity:
+    path: packages/coursepack_device_identity
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
