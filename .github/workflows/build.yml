@@ -40,6 +40,7 @@ jobs:
           flutter create --platforms=android --org=com.coursepack --project-name=app "$RUNNER_TEMP/coursepack-platform-seed"
           cp -R "$RUNNER_TEMP/coursepack-platform-seed/android" ./android
           sed -i 's/android:label="app"/android:label="CoursePack"/' android/app/src/main/AndroidManifest.xml
+          sed -i 's/android:name=".MainActivity"/android:name=".MainActivity" android:screenOrientation="sensorLandscape"/' android/app/src/main/AndroidManifest.xml
 
       - name: Test and build
         shell: bash

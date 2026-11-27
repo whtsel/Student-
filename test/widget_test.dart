@@ -1,12 +1,25 @@
-import 'package:coursepack/main.dart';
+import 'package:coursepack/crypto/course_pack_crypto.dart';
+import 'package:coursepack/licence/device_code_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('bootstrap screen shows the CoursePack name without demo data',
+  testWidgets('first launch shows the computed device code and activation steps',
       (tester) async {
-    await tester.pumpWidget(const CoursePackApp());
+    const components = 'test-only:synthetic-device';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DeviceCodeScreen(readComponents: () async => components),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    expect(find.text('CoursePack'), findsOneWidget);
+    final expected = CoursePackCrypto.formatFingerprint(
+      await CoursePackCrypto.computeFingerprint(components),
+    );
+    expect(find.text('Send this code to your instructor'), findsOneWidget);
+    expect(find.text(expected), findsOneWidget);
+    expect(find.text('Copy code'), findsOneWidget);
     expect(find.text('You have pushed the button this many times:'), findsNothing);
   });
 }

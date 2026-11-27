@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cryptography: ^2.7.0
+  coursepack_device_identity:
+    path: packages/coursepack_device_identity
 
 dev_dependencies:
   flutter_test:

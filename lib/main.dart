@@ -1,6 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:coursepack/licence/device_code_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
   runApp(const CoursePackApp());
 }
 
@@ -16,25 +26,7 @@ class CoursePackApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF245B9E)),
         useMaterial3: true,
       ),
-      home: const _BootstrapScreen(),
-    );
-  }
-}
-
-/// Temporary shell for the pipeline milestone. The activation flow is the
-/// first product screen and will replace this in the next implementation step.
-class _BootstrapScreen extends StatelessWidget {
-  const _BootstrapScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          'CoursePack',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
-        ),
-      ),
+      home: const DeviceCodeScreen(),
     );
   }
 }
