@@ -281,7 +281,7 @@ class _LicenserState extends State<LicenserScreen> {
     required String label,
     TextEditingController? controller,
     String? hint,
-    Widget? trailing,
+    Widget? suffix,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -308,7 +308,7 @@ class _LicenserState extends State<LicenserScreen> {
               ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              trailing: trailing,
+              suffix: suffix,
             ),
           ),
         ],
@@ -340,7 +340,7 @@ class _LicenserState extends State<LicenserScreen> {
                 label: 'Device code *',
                 controller: _fp,
                 hint: 'A1B2-C3D4-E5F6-7788',
-                trailing: _normalizedFp == null
+                suffix: _normalizedFp == null
                     ? null
                     : Padding(
                         padding: const EdgeInsets.only(right: 8),
@@ -410,7 +410,7 @@ class _LicenserState extends State<LicenserScreen> {
                   return CheckboxListTile(
                     value: checked,
                     onChanged: (value) => setState(() {
-                      if (value) {
+                      if (value == true) {
                         _selected.add(entry.id);
                       } else {
                         _selected.remove(entry.id);
@@ -440,7 +440,7 @@ class _LicenserState extends State<LicenserScreen> {
                     strokeWidth: 2,
                     color: Colors.white,
                   ))
-              : const Icon(Icons.how_to_sign),
+              : const Icon(Icons.draw),
           label: const Text('Issue and save .lic'),
         ),
       ],
@@ -524,7 +524,6 @@ class _LicenserState extends State<LicenserScreen> {
   }
 
   Widget _checkDetails(LicenceCheckResult result) {
-    final payload = result.payload!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -633,7 +632,7 @@ class _LicenserState extends State<LicenserScreen> {
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: _busy ? null : _loadCourseKeys,
-                icon: const Icon(Icons.collection_bookmarks_outlined),
+                icon: const Icon(Icons.collection_bookmarks),
                 label: const Text('Open course_keys.json'),
               ),
               const SizedBox(height: 14),

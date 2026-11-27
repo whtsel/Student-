@@ -99,10 +99,11 @@ class Ed25519Keys {
       throw const KeyImportException('The seed must be exactly 32 bytes.');
     }
     final keyPair = await Ed25519().newKeyPairFromSeed(seed);
+    final publicKey = await keyPair.extractPublicKey();
     return SigningKey(
       seed: Uint8List.fromList(seed),
       keyPair: keyPair,
-      publicKey: Uint8List.fromList(keyPair.publicKey.bytes),
+      publicKey: Uint8List.fromList(publicKey.bytes),
     );
   }
 }

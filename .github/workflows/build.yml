@@ -18,8 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  issues: write
+  contents: read
 
 # Expose the signing secrets as workflow-level env so their presence can be
 # tested in step `if:` conditions (the `secrets` context is not allowed
@@ -79,22 +78,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyse
-        shell: bash
-        run: |
-          flutter analyze --no-pub --no-fatal-infos > analyze.log 2>&1
-          status=$?
-          cat analyze.log
-          exit "$status"
-
-      - name: Publish analyze log
-        if: failure()
-        shell: bash
-        run: |
-          git config user.name "ci-diagnostic"
-          git config user.email "ci-diagnostic@users.noreply.github.com"
-          git add analyze.log
-          git commit -m "ci: capture flutter analyze log" || true
-          git push origin HEAD:refs/heads/ci-analyze-log
+        run: flutter analyze --no-pub --no-fatal-infos
 
       - name: Test
         run: flutter test

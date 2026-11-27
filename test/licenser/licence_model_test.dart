@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:coursepack/crypto/course_pack_crypto.dart';
 import 'package:coursepack/licenser/ed25519_keys.dart';
