@@ -11,7 +11,7 @@ class CoursePackDeviceIdentity {
   Future<String> readComponents() async {
     final value = await _channel.invokeMethod<String>('readComponents');
     if (value == null || value.isEmpty) {
-      throw const PlatformException(
+      throw PlatformException(
         code: 'device_identity_unavailable',
         message: 'The operating system did not provide device identity data.',
       );

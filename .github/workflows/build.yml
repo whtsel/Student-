@@ -102,7 +102,13 @@ jobs:
         shell: pwsh
         run: |
           flutter pub get
-          flutter build windows --release
+          $log = Join-Path $env:RUNNER_TEMP 'windows-build.log'
+          flutter build windows --release 2>&1 | Tee-Object -FilePath $log
+          $buildStatus = $LASTEXITCODE
+          if ($buildStatus -ne 0) {
+            Get-Content $log -Tail 24 | ForEach-Object { Write-Host "::error title=Windows build output::$_" }
+            exit $buildStatus
+          }
           $release = 'build/windows/x64/runner/Release'
           $package = Join-Path $env:RUNNER_TEMP 'CoursePack'
           New-Item -ItemType Directory -Path $package | Out-Null
