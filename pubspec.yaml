@@ -1,5 +1,5 @@
 name: coursepack
-description: An offline video course player for Android and Windows.
+description: CoursePack licence generator — issue and check device-bound licences, offline.
 publish_to: none
 version: 0.1.0+1
 
@@ -12,6 +12,8 @@ dependencies:
   cryptography: ^2.7.0
   coursepack_device_identity:
     path: packages/coursepack_device_identity
+  coursepack_file_io:
+    path: packages/coursepack_file_io
 
 dev_dependencies:
   flutter_test:

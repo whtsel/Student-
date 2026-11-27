@@ -22,8 +22,11 @@ licenses/
 *.keystore
 *.lic
 *.enc
-# Synthetic vectors are permitted only as tests, never course material.
+# Synthetic test vectors are permitted only under test/fixtures, never
+# course material or real keys.
 !test/fixtures/*.enc
+!test/fixtures/*.lic
+!test/fixtures/*.b64
 course_keys.json
 raw/
 dist/
