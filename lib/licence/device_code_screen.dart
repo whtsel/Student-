@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:coursepack/crypto/course_pack_crypto.dart';
@@ -70,12 +72,17 @@ class _DeviceCodeScreenState extends State<DeviceCodeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0B0D12),
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 560),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Card(
+        child: LayoutBuilder(
+          builder: (context, viewport) => SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: math.max(0.0, viewport.maxHeight - 32),
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  child: Card(
                 color: const Color(0xFF14171F),
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(color: Color(0xFF2B3241)),
@@ -202,6 +209,8 @@ class _DeviceCodeScreenState extends State<DeviceCodeScreen> {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
