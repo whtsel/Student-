@@ -63,7 +63,7 @@ jobs:
           set -e
           cat "$RUNNER_TEMP/flutter-test.log"
           if [ "$test_status" -ne 0 ]; then
-            { head -n 18 "$RUNNER_TEMP/flutter-test.log"; tail -n 12 "$RUNNER_TEMP/flutter-test.log"; } | while IFS= read -r line; do
+            { grep -E 'Error|Exception|Expected:|Actual:|Which:|TestFailure|Failure|package:coursepack|^00:.*\[E\]' "$RUNNER_TEMP/flutter-test.log" || true; tail -n 10 "$RUNNER_TEMP/flutter-test.log"; } | head -n 40 | while IFS= read -r line; do
               echo "::error title=Flutter test output::$line"
             done
             exit "$test_status"
