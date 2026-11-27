@@ -42,9 +42,20 @@ jobs:
           sed -i 's/android:label="app"/android:label="CoursePack"/' android/app/src/main/AndroidManifest.xml
 
       - name: Test and build
+        shell: bash
         run: |
           flutter pub get
-          flutter test
+          set +e
+          flutter test --reporter expanded > "$RUNNER_TEMP/flutter-test.log" 2>&1
+          test_status=$?
+          set -e
+          cat "$RUNNER_TEMP/flutter-test.log"
+          if [ "$test_status" -ne 0 ]; then
+            tail -n 24 "$RUNNER_TEMP/flutter-test.log" | while IFS= read -r line; do
+              echo "::error title=Flutter test output::$line"
+            done
+            exit "$test_status"
+          fi
           flutter build apk --debug
 
       - uses: actions/upload-artifact@v7
