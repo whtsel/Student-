@@ -370,7 +370,7 @@ void _writePretty(StringBuffer buffer, Object? value, int depth) {
       first = false;
       buffer.write('\n');
       _writeIndent(buffer, depth + 1);
-      buffer.write(_escapeString(entry.key.toString()));
+      buffer.write('"${_escapeString(entry.key.toString())}"');
       buffer.write(': ');
       _writePretty(buffer, entry.value, depth + 1);
     }
@@ -416,7 +416,7 @@ String _escapeScalar(Object? value) {
     case double d:
       return d.toString();
     case String s:
-      return _escapeString(s);
+      return '"${_escapeString(s)}"';
     default:
       throw ArgumentError('Cannot serialise ${value.runtimeType} to JSON.');
   }
