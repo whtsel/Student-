@@ -78,7 +78,17 @@ jobs:
         run: flutter pub get
 
       - name: Analyse
-        run: flutter analyze --no-pub --no-fatal-infos
+        shell: bash
+        run: |
+          flutter analyze --no-pub --no-fatal-infos > "$RUNNER_TEMP/analyze.log" 2>&1
+          status=$?
+          cat "$RUNNER_TEMP/analyze.log"
+          # Emit every diagnostic as an annotation so it is visible via the
+          # API even when the raw log CDN is not reachable.
+          while IFS= read -r line; do
+            echo "::error title=Flutter analyze::$line"
+          done < "$RUNNER_TEMP/analyze.log"
+          exit "$status"
 
       - name: Test
         run: flutter test
