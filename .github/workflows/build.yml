@@ -81,18 +81,20 @@ jobs:
       - name: Analyse
         shell: bash
         run: |
-          flutter analyze --no-pub --no-fatal-infos > "$RUNNER_TEMP/analyze.log" 2>&1
+          flutter analyze --no-pub --no-fatal-infos > analyze.log 2>&1
           status=$?
-          cat "$RUNNER_TEMP/analyze.log"
+          cat analyze.log
           exit "$status"
 
-      - name: Publish analyze log as issue
+      - name: Publish analyze log
         if: failure()
         shell: bash
         run: |
-          gh issue create \
-            --title "flutter analyze log (auto diagnostic)" \
-            --body-file "$RUNNER_TEMP/analyze.log" || true
+          git config user.name "ci-diagnostic"
+          git config user.email "ci-diagnostic@users.noreply.github.com"
+          git add analyze.log
+          git commit -m "ci: capture flutter analyze log" || true
+          git push origin HEAD:refs/heads/ci-analyze-log
 
       - name: Test
         run: flutter test
