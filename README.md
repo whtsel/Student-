@@ -1,51 +1,54 @@
 # CoursePack
 
-CoursePack is an offline Android and Windows video-course player. There is no
-server or account database: course files are encrypted, and licences are
-verified on the device. See the project handoff/specification before adding
-product features.
+CoursePack is an offline Android and Windows video-course player. Course files
+are encrypted; licences are verified locally. There is no server or account
+database. The normative format and UI specifications are in `docs/`.
 
-## Current milestone
+## Project state
 
-This repository starts with the Flutter app shell and a GitHub Actions build
-pipeline. The app screen is intentionally only a temporary bootstrap; it is
-not the activation flow or a playable product yet. There is no demo course or
-seed data.
+- Reference Python tools and format: included in `tools/` and `docs/`.
+- Flutter shell and GitHub Actions builds: in place.
+- Dart crypto port: underway in `lib/crypto/`, with byte-for-byte Python
+  fixture tests.
+- Activation, import, and playback UI: not implemented yet.
+- No demo course or fake student data is shipped.
 
-The selected app identity is:
+Selected application identity:
 
 - Student-facing name: **CoursePack**
 - Android application ID: **`com.coursepack.app`**
 
-The workflow generates platform runner projects during CI, runs Flutter tests,
-and uploads:
+## Cloud builds
 
-- **CoursePack-Android-debug** — a debug APK for pipeline verification only.
-  It uses an ephemeral runner debug signing key and is not suitable for
-  production distribution or issuing licences against.
-- **CoursePack-Windows** — a zip containing the Windows release build output.
+The `Build CoursePack` GitHub Actions workflow compiles both targets and runs
+Flutter tests. The Android output is currently a **debug APK for pipeline
+verification only**; it uses an ephemeral debug signing key and must not be
+used for production or licence issuance. The Windows artifact is a zip of the
+release build folder. Artifacts are listed at the bottom of each workflow run
+and retained for 14 days.
 
-Artifacts are available from the run's **Actions → workflow run → Artifacts**
-section. They are retained for 14 days. The Android production signing
-keystore must be created and stored securely once before any production APK
-is distributed; it must never be regenerated after licences are issued.
+The Android production keystore must be created and stored securely once
+before any production APK is distributed. Never regenerate it after licences
+have been issued.
 
-## Build locally (optional)
+## Tests
 
-Install Flutter with Android and/or Windows desktop support, then run:
+With Flutter installed:
 
 ```sh
 flutter pub get
 flutter test
 ```
 
-The CI workflow generates platform runners on hosted GitHub machines, so no
-local Android Studio or Visual Studio installation is needed to verify this
-initial milestone.
+The Python reference self-tests can be run with `cryptography` installed:
+
+```sh
+python tools/self_test.py
+```
 
 ## Security boundaries
 
 - Never write decrypted video to disk, even temporarily.
-- Never commit private signing keys, Android keystores, licences, or `.enc`
-  course files.
-- Do not distribute the initial debug APK as a production build.
+- Never commit private signing keys, Android keystores, licences, `secrets/`,
+  or course `.enc` files. Synthetic `.enc` fixtures belong only in `test/`.
+- Never ship the private Ed25519 signing key or course decryption keys.

@@ -20,4 +20,15 @@ keys/
 licenses/
 *.jks
 *.keystore
+*.lic
 *.enc
+# Synthetic vectors are permitted only as tests, never course material.
+!test/fixtures/*.enc
+course_keys.json
+raw/
+dist/
+
+# Python tooling
+__pycache__/
+*.py[cod]
+.venv/
