@@ -632,7 +632,7 @@ class _LicenserState extends State<LicenserScreen> {
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: _busy ? null : _loadCourseKeys,
-                icon: const Icon(Icons.collection_bookmarks),
+                icon: const Icon(Icons.bookmark),
                 label: const Text('Open course_keys.json'),
               ),
               const SizedBox(height: 14),
