@@ -1,4 +1,4 @@
-#include "course_pack_device_identity/course_pack_device_identity_plugin.h"
+#include "coursepack_device_identity/course_pack_device_identity_plugin.h"
 
 #include <windows.h>
 

@@ -4,7 +4,7 @@ project(${PLUGIN_NAME} LANGUAGES CXX)
 
 add_library(${PLUGIN_NAME} SHARED
   "coursepack_device_identity_plugin.cpp"
-  "include/course_pack_device_identity/course_pack_device_identity_plugin.h"
+  "include/coursepack_device_identity/course_pack_device_identity_plugin.h"
 )
 apply_standard_settings(${PLUGIN_NAME})
 set_target_properties(${PLUGIN_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
