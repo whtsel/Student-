@@ -7,6 +7,9 @@
 
 #include <memory>
 
+void CoursePackDeviceIdentityPluginRegisterWithRegistrar(
+    FlutterDesktopPluginRegistrarRef registrar);
+
 class CoursePackDeviceIdentityPlugin : public flutter::Plugin {
  public:
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows* registrar);

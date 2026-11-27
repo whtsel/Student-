@@ -121,3 +121,10 @@ void CoursePackDeviceIdentityPlugin::HandleMethodCall(
   }
   result->Success(flutter::EncodableValue(components));
 }
+
+void CoursePackDeviceIdentityPluginRegisterWithRegistrar(
+    FlutterDesktopPluginRegistrarRef registrar) {
+  CoursePackDeviceIdentityPlugin::RegisterWithRegistrar(
+      flutter::PluginRegistrarManager::GetInstance()
+          ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
+}
