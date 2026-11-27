@@ -7,6 +7,13 @@
 
 #include <memory>
 
+#if defined(FLUTTER_PLUGIN_IMPL)
+#define COURSEPACK_DEVICE_IDENTITY_PLUGIN_EXPORT __declspec(dllexport)
+#else
+#define COURSEPACK_DEVICE_IDENTITY_PLUGIN_EXPORT __declspec(dllimport)
+#endif
+
+COURSEPACK_DEVICE_IDENTITY_PLUGIN_EXPORT
 void CoursePackDeviceIdentityPluginRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar);
 

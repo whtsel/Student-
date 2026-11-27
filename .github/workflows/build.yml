@@ -106,7 +106,8 @@ jobs:
           flutter build windows --release 2>&1 | Tee-Object -FilePath $log
           $buildStatus = $LASTEXITCODE
           if ($buildStatus -ne 0) {
-            Get-Content $log -Tail 24 | ForEach-Object { Write-Host "::error title=Windows build output::$_" }
+            Get-Content $log | Select-String -Pattern 'error C[0-9]+|error LNK|fatal error|CMake Error|FAILED' | Select-Object -Last 20 | ForEach-Object { Write-Host "::error title=Windows compiler error::$($_.Line)" }
+            Get-Content $log -Tail 12 | ForEach-Object { Write-Host "::error title=Windows build tail::$_" }
             exit $buildStatus
           }
           $release = 'build/windows/x64/runner/Release'
