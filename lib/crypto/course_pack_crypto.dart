@@ -289,7 +289,7 @@ class CoursePackCrypto {
     final key = SimplePublicKey(publicKey, type: KeyPairType.ed25519);
     return Ed25519().verify(
       message,
-      signature: Signature(signature, publicKey: key),
+      signature: Signature(signature),
       publicKey: key,
     );
   }
