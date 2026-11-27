@@ -27,6 +27,9 @@ void main() {
     expect(find.text('Issue a licence'), findsOneWidget);
     expect(find.text('Student name *'), findsOneWidget);
     expect(find.text('Device code *'), findsOneWidget);
+    // The save button sits below the fold in a lazy ListView; scroll to it.
+    await tester.drag(find.byType(ListView), const Offset(0.0, -800.0));
+    await tester.pumpAndSettle();
     expect(find.text('Issue and save .lic'), findsOneWidget);
   });
 
@@ -42,6 +45,9 @@ void main() {
 
     expect(find.text('Signing key'), findsOneWidget);
     expect(find.text('Open private key (.pem)'), findsOneWidget);
+    // 'Course keys' and its button sit below the fold in a lazy ListView.
+    await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+    await tester.pumpAndSettle();
     expect(find.text('Course keys'), findsOneWidget);
     expect(find.text('Open course_keys.json'), findsOneWidget);
   });

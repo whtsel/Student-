@@ -441,7 +441,7 @@ String _escapeString(String value) {
     } else if (char < 0x20) {
       buffer.write('\\u${char.toRadixString(16).padLeft(4, '0')}');
     } else {
-      buffer.write(char);
+      buffer.writeCharCode(char);
     }
   }
   return buffer.toString();
