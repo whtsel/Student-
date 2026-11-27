@@ -1,0 +1,85 @@
+name: Build CoursePack
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Android APK (debug / pipeline check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android runner
+        shell: bash
+        run: |
+          flutter create --platforms=android --org=com.coursepack --project-name=app "$RUNNER_TEMP/coursepack-platform-seed"
+          cp -R "$RUNNER_TEMP/coursepack-platform-seed/android" ./android
+          sed -i 's/android:label="app"/android:label="CoursePack"/' android/app/src/main/AndroidManifest.xml
+
+      - name: Test and build
+        run: |
+          flutter pub get
+          flutter test
+          flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoursePack-Android-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  windows:
+    name: Windows app folder
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Windows runner
+        shell: pwsh
+        run: |
+          flutter create --platforms=windows --org=com.coursepack --project-name=app "$env:RUNNER_TEMP/coursepack-platform-seed"
+          Copy-Item -Recurse "$env:RUNNER_TEMP/coursepack-platform-seed/windows" ./windows
+          $rcPath = 'windows/runner/Runner.rc'
+          $rc = Get-Content $rcPath -Raw
+          $rc = $rc.Replace('"Runner"', '"CoursePack"')
+          [System.IO.File]::WriteAllText((Resolve-Path $rcPath), $rc, [System.Text.UTF8Encoding]::new($false))
+
+      - name: Build and package
+        shell: pwsh
+        run: |
+          flutter pub get
+          flutter build windows --release
+          $release = 'build/windows/x64/runner/Release'
+          $package = Join-Path $env:RUNNER_TEMP 'CoursePack'
+          New-Item -ItemType Directory -Path $package | Out-Null
+          Copy-Item -Recurse "$release/*" $package
+          Compress-Archive -Path $package -DestinationPath 'CoursePack-Windows.zip'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoursePack-Windows
+          path: CoursePack-Windows.zip
+          if-no-files-found: error
+          retention-days: 14
