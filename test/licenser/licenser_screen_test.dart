@@ -13,6 +13,9 @@ class _FakeFileIo implements FileIo {
     required String text,
   }) async =>
       'file:///$filename';
+
+  @override
+  Future<String?> pickFilePath() async => null;
 }
 
 void main() {

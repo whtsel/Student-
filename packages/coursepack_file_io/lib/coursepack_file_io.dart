@@ -14,6 +14,15 @@ abstract class FileIo {
     required String filename,
     required String text,
   });
+
+  /// Opens the system "open" picker for a binary file and returns a real
+  /// filesystem path (a copy of the picked content placed in app cache), or
+  /// `null` if the user cancelled or the read failed.
+  ///
+  /// Unlike [pickTextFile], which returns file *content* as text, this is for
+  /// binary files (e.g. a CoursePack `.enc` video) that must be read with
+  /// random access and therefore need a path, not a text blob.
+  Future<String?> pickFilePath();
 }
 
 /// [FileIo] backed by the `com.coursepack/file_io` platform channel.
@@ -43,5 +52,10 @@ class CoursepackFileIo implements FileIo {
       <String, Object>{'filename': filename, 'text': text},
     );
     return uri;
+  }
+
+  @override
+  Future<String?> pickFilePath() async {
+    return _channel.invokeMethod<String>('pickFilePath');
   }
 }

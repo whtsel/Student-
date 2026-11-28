@@ -1,0 +1,28 @@
+name: coursepack_player
+description: CoursePack users app — device-bound licence gate and encrypted video playback. Only plays CoursePack .enc files.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cryptography: ^2.7.0
+  video_player: ^2.14.0
+  coursepack_crypto:
+    path: ../../packages/coursepack_crypto
+  coursepack_licence:
+    path: ../../packages/coursepack_licence
+  coursepack_device_identity:
+    path: ../../packages/coursepack_device_identity
+  coursepack_file_io:
+    path: ../../packages/coursepack_file_io
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

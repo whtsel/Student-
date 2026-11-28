@@ -28,6 +28,7 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, A
     private var saveLauncher: ActivityResultLauncher<Intent>? = null
 
     private var pendingPick: MethodChannel.Result? = null
+    private var pendingPickPath: Boolean = false
     private var pendingSave: Pair<MethodChannel.Result, String>? = null
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -68,7 +69,16 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, A
                 val pending = pendingPick
                 pendingPick = null
                 val uri = result.data?.data
-                pending?.success(uri?.let { readText(it) })
+                if (pending == null || uri == null) {
+                    pending?.success(null)
+                    return@registerForActivityResult
+                }
+                if (pendingPickPath) {
+                    pendingPickPath = false
+                    pending.success(copyToTempFile(uri))
+                } else {
+                    pending.success(readText(uri))
+                }
             }
         }
         if (saveLauncher == null) {
@@ -103,6 +113,17 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, A
                 )
             pickLauncher?.launch(intent)
                 ?: result.error("no_activity", "The file picker is not available yet.", null)
+        } else if (method == "pickFilePath") {
+            pendingPick = result
+            pendingPickPath = true
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .putExtra(
+                    Intent.EXTRA_MIME_TYPES,
+                    arrayOf("application/octet-stream", "*/*"),
+                )
+            pickLauncher?.launch(intent)
+                ?: result.error("no_activity", "The file picker is not available yet.", null)
         } else if (method == "saveTextFile") {
             val filename = call.argument<String>("filename").orEmpty()
             val text = call.argument<String>("text").orEmpty()
@@ -130,5 +151,26 @@ class CoursepackFileIoPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, A
         current.contentResolver.openOutputStream(uri, "wt")
             ?.use { it.write(text.toByteArray()) }
             ?: throw FileNotFoundException("Cannot write $uri.")
+    }
+
+    /**
+     * Copies the content at [uri] to a temporary file in the app cache and
+     * returns its absolute path. Content URIs returned by the Storage Access
+     * Framework cannot be read directly by Dart's [java.io.File], so binary
+     * files (e.g. an `.enc` video) are staged to a real path first.
+     */
+    private fun copyToTempFile(uri: Uri): String {
+        val current = activity ?: throw FileNotFoundException("No activity to read from.")
+        val temp = java.io.File.createTempFile(
+            "coursepack-pick",
+            ".tmp",
+            current.cacheDir,
+        )
+        current.contentResolver.openInputStream(uri)
+            ?.use { input ->
+                temp.outputStream().use { output -> input.copyTo(output) }
+            }
+            ?: throw FileNotFoundException("Cannot read $uri.")
+        return temp.absolutePath
     }
 }
