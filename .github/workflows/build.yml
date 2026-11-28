@@ -23,7 +23,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 # Expose the signing secrets as workflow-level env so their presence can be
 # tested in step `if:` conditions (the `secrets` context is not allowed
@@ -97,27 +97,11 @@ jobs:
           dart test
 
       - name: Encrypter tests — coursepack_encrypter
-        shell: bash
         run: |
           cd tools/encrypt_video
           dart pub get
-          dart analyze > encrypter_test.log 2>&1
-          echo "ANALYZE_EXIT=$?" >> encrypter_test.log
-          dart test >> encrypter_test.log 2>&1
-          echo "TEST_EXIT=$?" >> encrypter_test.log
-          cat encrypter_test.log
-
-      - name: Push encrypter test log (diagnostic)
-        if: always()
-        run: |
-          git config user.name "ci-diag"
-          git config user.email "ci-diag@example.com"
-          git fetch origin arena/ab7e4a0b-student
-          git checkout -B ci-diag-log origin/arena/ab7e4a0b-student
-          cp tools/encrypt_video/encrypter_test.log ./encrypter_test.log 2>/dev/null || true
-          git add encrypter_test.log 2>/dev/null || true
-          git commit -m "diag: encrypter test log" 2>/dev/null || true
-          git push --force origin HEAD:refs/heads/ci-diag-log 2>/dev/null || true
+          dart analyze
+          dart test
 
       - name: Analyse
         run: flutter analyze --no-pub --no-fatal-infos
