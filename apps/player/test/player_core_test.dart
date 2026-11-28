@@ -41,7 +41,7 @@ void main() {
       final result = CoursePackValidator().check(path);
       expect(result.ok, isTrue, reason: result.message);
       expect(result.header, isNotNull);
-      expect(result.header!.plaintextSize, plaintext.length);
+      expect(result.header!.plaintextSize, utf8.encode(plaintext).length);
     });
 
     test('rejects a plain (non-CoursePack) file', () async {

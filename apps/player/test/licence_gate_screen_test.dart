@@ -133,7 +133,7 @@ void main() {
 
     // Fingerprint mismatch → no "Open course" button, and a rejection shown.
     expect(find.text('Open course'), findsNothing);
-    expect(find.textContaining('fingerprint'), findsWidgets);
+    expect(find.textContaining('different device'), findsWidgets);
   });
 
   testWidgets('rejects a tampered licence', (WidgetTester tester) async {
