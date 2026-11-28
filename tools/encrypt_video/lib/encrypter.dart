@@ -218,10 +218,10 @@ class CourseEncrypter {
       chunkLog2: chunkLog2,
     );
 
-    // Write the header (this creates/truncates the output file), then
-    // stream each encrypted chunk by appending. `File.appendAsBytesSync`
-    // opens, writes and closes per call, which keeps memory bounded for
-    // large videos without relying on RandomAccessFile write methods.
+    // Write the header (creates/truncates the file), then stream each
+    // encrypted chunk by appending. `File.writeAsBytesSync` with
+    // `FileMode.append` opens, writes and closes per call, keeping memory
+    // bounded for large videos.
     File(encPath).writeAsBytesSync(header);
 
     final chunkSize = 1 << chunkLog2;
@@ -241,7 +241,7 @@ class CourseEncrypter {
           fileNonce: fileNonce,
           index: index,
         );
-        File(encPath).appendAsBytesSync(encrypted);
+        File(encPath).writeAsBytesSync(encrypted, mode: FileMode.append);
       }
     } finally {
       sourceRaf.closeSync();
