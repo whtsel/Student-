@@ -99,26 +99,42 @@ class CourseEncrypter {
   final CoursePackCrypto _crypto;
   final Random _random;
 
+  /// Cryptographically-secure random bytes. `Random.secure()` is used so the
+  /// content keys, file nonces and file ids are not predictable.
   Uint8List _randomBytes(int length) {
     final out = Uint8List(length);
-    _random.nextBytes(out);
+    for (var i = 0; i < length; i++) {
+      out[i] = _random.nextInt(256);
+    }
     return out;
   }
 
-  /// Natural sort key so `L02` sorts before `L10` (mirrors make_course.py).
-  List<Object> _naturalKey(String name) {
-    return <Object>[
-      for (final part in RegExp(r'(\d+)').split(name))
-        part.isNotEmpty && part.contains(RegExp(r'^\d+$'))
-            ? int.parse(part)
-            : part.toLowerCase(),
-    ];
+  /// Natural sort comparator so `L02` sorts before `L10` (mirrors the
+  /// `natural_key` helper in make_course.py). Splits a name on runs of
+  /// digits and compares digit runs numerically, text runs lexically.
+  int _naturalCompare(String a, String b) {
+    final re = RegExp(r'(\d+)');
+    final ka = a.split(re);
+    final kb = b.split(re);
+    final minLen = ka.length < kb.length ? ka.length : kb.length;
+    for (var i = 0; i < minLen; i++) {
+      final va = ka[i];
+      final vb = kb[i];
+      if (va == vb) continue;
+      final isNumA = RegExp(r'^\d+$').hasMatch(va);
+      final isNumB = RegExp(r'^\d+$').hasMatch(vb);
+      if (isNumA && isNumB) {
+        return int.parse(va).compareTo(int.parse(vb));
+      }
+      return va.compareTo(vb);
+    }
+    return ka.length.compareTo(kb.length);
   }
 
   /// Strip a leading lecture-number prefix (`01-`, `01_`, `01.`, `01)`, …)
   /// from a filename stem to produce a human title (mirrors make_course.py).
   String _labelFromStem(String stem) {
-    final stripped = RegExp(r'^[0-9]+[-_. )]*').replaceAll(stem, '');
+    final stripped = stem.replaceAll(RegExp(r'^[0-9]+[-_. )]*'), '');
     return stripped.isEmpty ? stem : stripped;
   }
 
@@ -126,7 +142,9 @@ class CourseEncrypter {
     var value = n;
     for (final unit in <String>['B', 'KB', 'MB', 'GB', 'TB']) {
       if (value.abs() < 1024 || unit == 'TB') {
-        return unit == 'B' ? '${value.toInt()} B' : '${value.toStringAsFixed(1)} $unit';
+        return unit == 'B'
+            ? '${value.toInt()} B'
+            : '${value.toStringAsFixed(1)} $unit';
       }
       value /= 1024;
     }
@@ -145,10 +163,11 @@ class CourseEncrypter {
           '-of', 'default=nw=1:nk=1',
           path,
         ],
-        runSync: false,
       );
       if (result.exitCode != 0) return null;
-      return double.tryParse(result.stdout.trim())?.roundTo(2);
+      final seconds = double.tryParse(result.stdout.trim());
+      if (seconds == null) return null;
+      return (seconds * 100).round() / 100;
     } on ProcessException {
       return null;
     }
@@ -169,7 +188,7 @@ class CourseEncrypter {
       dst,
     ];
     try {
-      await Process.run(cmd[0], cmd.sublist(1), runSync: false);
+      await Process.run(cmd[0], cmd.sublist(1));
     } on ProcessException {
       throw const CoursePackError('--reencode needs ffmpeg on PATH');
     }
@@ -199,10 +218,11 @@ class CourseEncrypter {
       chunkLog2: chunkLog2,
     );
 
-    final out = File(encPath)..createSync();
-    final outRaf = out.openSync();
+    // Open the output for writing. `RandomAccessFile.write` is async (it
+    // returns a Future), so we await each chunk as we encrypt it.
+    final outRaf = File(encPath).openSync(mode: FileMode.write);
     try {
-      outRaf.writeSync(header);
+      await outRaf.write(header);
 
       final chunkSize = 1 << chunkLog2;
       final chunkCount =
@@ -221,7 +241,7 @@ class CourseEncrypter {
             fileNonce: fileNonce,
             index: index,
           );
-          outRaf.writeSync(encrypted);
+          await outRaf.write(encrypted);
         }
       } finally {
         sourceRaf.closeSync();
@@ -230,16 +250,16 @@ class CourseEncrypter {
       outRaf.closeSync();
     }
 
-    final encSize = out.lengthSync();
+    final encSize = File(encPath).lengthSync();
 
     // Hash the .enc file, then re-read and validate its header (a sanity
     // check that the header we wrote parses back cleanly).
     final sha = await _crypto.sha256(File(encPath).readAsBytesSync());
-    final raf = File(encPath).openSync();
+    final headerRaf = File(encPath).openSync();
     try {
-      _crypto.parseHeader(raf.readSync(coursePackHeaderSize));
+      _crypto.parseHeader(headerRaf.readSync(coursePackHeaderSize));
     } finally {
-      raf.closeSync();
+      headerRaf.closeSync();
     }
 
     return _EncryptedFile(
@@ -267,17 +287,16 @@ class CourseEncrypter {
     int maxHeight = 1080,
   }) async {
     // ---- collect inputs --------------------------------------------------
-    final files = <String>;
+    final files = <String>[];
     if (Directory(input).existsSync()) {
-      final dir = Directory(input);
-      files.addAll(dir
+      files.addAll(Directory(input)
           .listSync()
           .whereType<File>()
           .map((f) => f.path)
           .where((p) =>
               _videoExts.contains(p.toLowerCase().substring(p.lastIndexOf('.'))))
-          .toList()
-          ..sort((a, b) => _naturalKey(a).compareTo(_naturalKey(b))));
+          .toList());
+      files.sort(_naturalCompare);
     } else if (File(input).existsSync()) {
       files.add(input);
     } else {
@@ -304,8 +323,6 @@ class CourseEncrypter {
     final keyLectures = <Map<String, Object?>>[];
     final lectures = <EncryptedLecture>[];
     final warnings = <String>[];
-    var totalPlaintext = 0;
-    var totalCiphertext = 0;
 
     for (var idx = 1; idx <= files.length; idx++) {
       final src = files[idx - 1];
@@ -323,7 +340,8 @@ class CourseEncrypter {
         if (reencode) {
           workDir = Directory.systemTemp.createTempSync('cp-').path;
           toEncrypt = await _reencode(src, workDir, crf, maxHeight);
-          print('    re-encoded -> ${_human(File(toEncrypt).lengthSync().toDouble())}');
+          print('    re-encoded -> '
+              '${_human(File(toEncrypt).lengthSync().toDouble())}');
         }
 
         final key = _randomBytes(coursePackKeySize);
@@ -334,7 +352,7 @@ class CourseEncrypter {
         if (encrypted.encSize > _telegramWarnBytes) {
           warnings.add(
             '$lid is ${_human(encrypted.encSize.toDouble())} — over '
-            'Telegram\'s 2 GB per-file cap. Split it or re-run with --reencode.',
+            "Telegram's 2 GB per-file cap. Split it or re-run with --reencode.",
           );
         }
 
@@ -352,8 +370,6 @@ class CourseEncrypter {
         lectures.add(lecture);
         manifestLectures.add(lecture.toManifestEntry());
         keyLectures.add(lecture.toKeysEntry());
-        totalPlaintext += encrypted.plaintextSize;
-        totalCiphertext += encrypted.encSize;
         print('       -> ${_human(encrypted.encSize.toDouble())}  '
             'sha256 ${encrypted.sha256.substring(0, 16)}…');
       } finally {
@@ -427,11 +443,4 @@ class _EncryptedFile {
   final int encSize;
   final int plaintextSize;
   final String sha256;
-}
-
-extension on double {
-  double roundTo(int digits) {
-    final factor = pow(10, digits).toDouble();
-    return (this * factor).round() / factor;
-  }
 }

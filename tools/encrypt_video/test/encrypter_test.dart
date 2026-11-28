@@ -22,10 +22,6 @@ void main() {
       signingKey = await Ed25519Keys.fromSeed(_testSeed);
     });
 
-    tearDownAll() {
-      tmp.deleteSync(recursive: true);
-    }
-
     /// Write a small synthetic "video" file (not a real video — just bytes
     /// the encrypter will chunk and encrypt).
     File _writeSource(String name, int size) {
@@ -72,20 +68,17 @@ void main() {
         final key = CoursePackCrypto.decodeBase64(lecture.contentKeyBase64);
         expect(key.length, coursePackKeySize);
 
-        final encFile = File(encPath);
-        final headerBytes = encFile.openSync().readSync(coursePackHeaderSize);
-        final header = CoursePackCrypto().parseHeader(headerBytes);
+        // Load the whole .enc file once and slice it for random access —
+        // the test files are small, so this is simpler than a RandomAccessFile.
+        final encBytes = File(encPath).readAsBytesSync();
+        final header =
+            CoursePackCrypto().parseHeader(encBytes.sublist(0, coursePackHeaderSize));
         expect(header.plaintextSize, lecture.plaintextSize);
         expect(header.chunkLog2, 12);
 
-        // Decrypt the whole file chunk-by-chunk and compare to the source.
-        final readAt = (int offset, int length) async {
-          final raf = encFile.openSync();
-          raf.seek(offset);
-          final bytes = raf.readSync(length);
-          raf.closeSync();
-          return bytes;
-        };
+        final readAt = (int offset, int length) async =>
+            encBytes.sublist(offset, offset + length);
+
         final plaintext = await CoursePackCrypto().decryptRange(
           readAt: readAt,
           header: header,
@@ -94,7 +87,8 @@ void main() {
           end: header.plaintextSize,
         );
 
-        final sourceName = lecture.file == 'L01.enc' ? '01-intro.mp4' : '02-lecture.mp4';
+        final sourceName =
+            lecture.file == 'L01.enc' ? '01-intro.mp4' : '02-lecture.mp4';
         final original = File('${tmp.path}/$sourceName').readAsBytesSync();
         expect(plaintext, original);
       }
@@ -140,8 +134,10 @@ void main() {
       expect(keyLectures.length, 1);
       final entry = keyLectures.first as Map<String, dynamic>;
       expect(entry['key'], isA<String>());
-      expect(CoursePackCrypto.decodeBase64(entry['key'] as String).length,
-          coursePackKeySize);
+      expect(
+        CoursePackCrypto.decodeBase64(entry['key'] as String).length,
+        coursePackKeySize,
+      );
     });
 
     test('rejects a non-existent input path', () async {

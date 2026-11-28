@@ -55,8 +55,8 @@ void main(List<String> args) async {
     );
     final totalCt = result.lectures.fold<int>(0, (sum, l) => sum + l.size);
     print('');
-    print('done. ${_human(totalPt)} plaintext -> '
-        '${_human(totalCt)} encrypted');
+    print('done. ${_human(totalPt.toDouble())} plaintext -> '
+        '${_human(totalCt.toDouble())} encrypted');
     print('  ship  : ${result.outDir}/  '
         '(${result.lectures.length} .enc + manifest.json + manifest.sig)');
     print('  secret: ${result.secretsPath}   <-- never upload this');
@@ -118,7 +118,7 @@ class _ArgParser {
 
   _EncrypterOpts parse(List<String> args) {
     var i = 0;
-    String? next() {
+    String next() {
       if (i >= args.length) {
         throw ArgumentError('missing value for a flag');
       }
