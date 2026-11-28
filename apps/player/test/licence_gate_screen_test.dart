@@ -55,8 +55,8 @@ CourseKeys _course() {
 }
 
 Future<(Uint8List pub, String licText)> _issueLicence(String fingerprint) async {
-  final seed = CoursePackCrypto.decodeBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-  final key = await Ed25519Keys.fromSeed(seed);
+  // A valid 32-byte Ed25519 seed (all zeros is fine for a test keypair).
+  final key = await Ed25519Keys.fromSeed(Uint8List(32));
   final issued = await LicenceGenerator(key: key, course: _course()).issue(
     name: 'Ama Mensah',
     fingerprint: fingerprint,
