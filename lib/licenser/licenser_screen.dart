@@ -579,8 +579,10 @@ class _LicenserState extends State<LicenserScreen> {
                       color: _text, fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
               Text(
-                'Your Ed25519 private key. It never leaves this device and is '
-                'never written anywhere except the file you choose.',
+                'Your Ed25519 private key, loaded at runtime. It is held in '
+                'memory only — never written to disk, never shipped inside '
+                'the app, and never committed to the repository. Only the '
+                'public key is embedded for verifying licences.',
                 style: TextStyle(color: _muted, height: 1.5),
               ),
               const SizedBox(height: 16),
@@ -609,7 +611,14 @@ class _LicenserState extends State<LicenserScreen> {
                     const Divider(color: _line, height: 20),
                     _detail('Status', 'Loaded'),
                     _detail('Public key', key.publicKeyBase64),
-                    _detail('Seed (hex)', key.seedHex),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: Text(
+                        'The seed is held in memory only — it is never '
+                        'displayed, written to disk, or shipped in the app.',
+                        style: TextStyle(color: _muted, fontSize: 12),
+                      ),
+                    ),
                   ],
                 ),
             ],

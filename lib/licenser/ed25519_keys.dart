@@ -28,9 +28,6 @@ class SigningKey {
   final Uint8List publicKey;
 
   String get publicKeyBase64 => CoursePackCrypto.encodeBase64(publicKey);
-
-  String get seedHex =>
-      seed.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
 }
 
 /// Imports the seller's Ed25519 signing key from the artefacts produced by
