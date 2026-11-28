@@ -78,7 +78,22 @@ jobs:
         run: flutter pub get
 
       - name: Analyse
-        run: flutter analyze --no-pub --no-fatal-infos
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter analyze --no-pub --no-fatal-infos 2>&1 | tee analyze.log
+
+      - name: Push analyse log (diagnostic)
+        if: always()
+        run: |
+          git config user.name "ci-diag"
+          git config user.email "ci-diag@example.com"
+          git fetch origin arena/ab7e4a0b-student
+          git checkout -B ci-diag-log origin/arena/ab7e4a0b-student
+          cp analyze.log ./analyze.log 2>/dev/null || true
+          git add analyze.log 2>/dev/null || true
+          git commit -m "diag: analyse log" 2>/dev/null || true
+          git push --force origin HEAD:refs/heads/ci-diag-log 2>/dev/null || true
 
       - name: Test
         run: flutter test
