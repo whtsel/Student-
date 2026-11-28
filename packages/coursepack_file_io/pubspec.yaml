@@ -1,0 +1,19 @@
+name: coursepack_file_io
+description: System file picker and saver for the CoursePack licence generator.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.coursepack.file_io
+        pluginClass: CoursepackFileIoPlugin

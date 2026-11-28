@@ -1,0 +1,24 @@
+# Root app analysis options.
+#
+# This repository is a small monorepo: the installable apps live at the root
+# and under apps/, and the reusable, pure-Dart shared code lives under
+# packages/. Each app and package is a separate Dart package with its own
+# pubspec.yaml and is tested/analyzed in its own context (see the per-package
+# / per-app `dart test`, `dart analyze` and `flutter test` CI steps).
+#
+# The package *lib* files are still analyzed from the app root — that gives us
+# coverage of the shared crypto/licence code and catches any import-path
+# regressions. Only the package *test* directories are excluded here, because
+# they depend on `package:test`, which is a dev-dependency of the packages but
+# not of the app, so the app-root analyzer cannot resolve `test`/`expect`.
+# Excluding them from the app-root scope avoids spurious undefined-symbol
+# errors; each package's tests run under its own `dart test` invocation.
+#
+# The `apps/` installable apps (e.g. the player) are excluded from the root
+# scope because they depend on packages (such as `video_player`) that are not
+# dependencies of the root app; they are analyzed in their own directory by a
+# dedicated CI step instead.
+analyzer:
+  exclude:
+    - packages/*/test/**
+    - apps/**

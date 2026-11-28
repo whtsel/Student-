@@ -1,0 +1,15 @@
+# Player app analysis options.
+#
+# The player is a separate installable Flutter app under apps/. It is analyzed
+# in its own directory (a dedicated CI step runs `flutter analyze` here), so
+# it must NOT inherit the root analysis_options.yaml, whose `apps/**` exclusion
+# is scoped to the root app and would otherwise hide this app's own files.
+#
+# This file intentionally declares no extra analyzer rules, matching the root
+# app's convention. The player's tests depend on `flutter_test`, which is a
+# dev-dependency of this package, so they resolve normally here and need no
+# exclusion.
+analyzer:
+  language:
+    strict-casts: false
+    strict-inference: false

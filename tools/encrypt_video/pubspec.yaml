@@ -1,0 +1,17 @@
+name: coursepack_encrypter
+description: Standalone CoursePack video encrypter. Encrypts lecture videos into .enc files and signs the manifest. Pure Dart CLI — mirrors tools/make_course.py.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  cryptography: ^2.7.0
+  coursepack_crypto:
+    path: ../../packages/coursepack_crypto
+  coursepack_licence:
+    path: ../../packages/coursepack_licence
+
+dev_dependencies:
+  test: ^1.24.0
