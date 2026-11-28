@@ -40,7 +40,7 @@ class CoursePackValidator {
 
   final CoursePackCrypto _crypto;
 
-  /// Reads the first [CoursePackCrypto.coursePackHeaderSize] bytes of the file
+  /// Reads the first [coursePackHeaderSize] bytes of the file
   /// at [path] and validates them as a CoursePack header.
   ///
   /// Throws [CoursePackError] for any structural problem; callers that want a
@@ -52,8 +52,8 @@ class CoursePackValidator {
     }
     final raf = file.openSync();
     try {
-      final headerBytes = raf.readSync(CoursePackCrypto.coursePackHeaderSize);
-      if (headerBytes.length < CoursePackCrypto.coursePackHeaderSize) {
+      final headerBytes = raf.readSync(coursePackHeaderSize);
+      if (headerBytes.length < coursePackHeaderSize) {
         throw const CoursePackError(
           'file is shorter than a CoursePack header — not a .enc file',
         );

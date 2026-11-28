@@ -33,7 +33,7 @@ class DecryptedVideo {
     String? tempPath;
     try {
       // Read and validate the header first.
-      final headerBytes = raf.readSync(CoursePackCrypto.coursePackHeaderSize);
+      final headerBytes = raf.readSync(coursePackHeaderSize);
       final header = _crypto.parseHeader(headerBytes);
 
       // Write plaintext to a temp file, chunk by chunk.
