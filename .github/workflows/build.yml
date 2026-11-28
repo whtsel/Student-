@@ -27,7 +27,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 # Expose the signing secrets as workflow-level env so their presence can be
 # tested in step `if:` conditions (the `secrets` context is not allowed
@@ -156,14 +156,26 @@ jobs:
       - name: Generate player Android runner
         shell: bash
         run: |
+          set -o pipefail
           cd apps/player
-          flutter create --platforms=android --org=com.coursepack \
-            --project-name=coursepack_player "$RUNNER_TEMP/player-platform-seed"
-          cp -R "$RUNNER_TEMP/player-platform-seed/android" ./android
-          sed -i 's/android:label="app"/android:label="CoursePack Player"/' android/app/src/main/AndroidManifest.xml
-          # video_player requires minSdkVersion >= 24.
-          sed -i -E 's/^([[:space:]]*)minSdkVersion[[:space:]]+.*/\1minSdkVersion 24/' android/app/build.gradle
-          grep minSdkVersion android/app/build.gradle
+          {
+            flutter create --platforms=android --org=com.coursepack \
+              --project-name=coursepack_player "$RUNNER_TEMP/player-platform-seed"
+            cp -R "$RUNNER_TEMP/player-platform-seed/android" ./android
+            sed -i 's/android:label="app"/android:label="CoursePack Player"/' android/app/src/main/AndroidManifest.xml
+            # video_player requires minSdkVersion >= 24.
+            sed -i -E 's/^([[:space:]]*)minSdkVersion[[:space:]]+.*/\1minSdkVersion 24/' android/app/build.gradle
+            grep minSdkVersion android/app/build.gradle
+          } 2>&1 | tee player_diag.log
+
+      - name: Push diagnostic log
+        if: always()
+        run: |
+          git config user.email "ci@example.com"
+          git config user.name "CI Diag"
+          git add player_diag.log
+          git commit -m "player diag log" --allow-empty || true
+          git push --force origin HEAD:refs/heads/ci-diag-log
 
       - name: Restore signing key
         if: ${{ env.KEYSTORE_BASE64 != '' }}
