@@ -96,6 +96,13 @@ jobs:
           dart analyze
           dart test
 
+      - name: Encrypter tests — coursepack_encrypter
+        run: |
+          cd tools/encrypt_video
+          dart pub get
+          dart analyze
+          dart test
+
       - name: Analyse
         run: flutter analyze --no-pub --no-fatal-infos
 
