@@ -36,10 +36,12 @@ class DecryptedVideo {
     final header =
         _crypto.parseHeader(allBytes.sublist(0, coursePackHeaderSize));
 
-    // Write plaintext to a temp file, chunk by chunk.
+    // Write plaintext to a temp file, chunk by chunk. This SDK's
+    // RandomAccessFile lacks write(), so append each chunk via
+    // File.writeAsBytesSync with FileMode.append (the approach the encrypter
+    // uses for its output stream).
     final temp = Directory.systemTemp.createTempSync('cp-play-', extension: '.mp4');
     final tempPath = temp.path;
-    final out = temp.openSync(mode: FileMode.write);
     try {
       for (var index = 0; index < header.chunkCount; index++) {
         final plaintext = await _crypto.decryptChunk(
@@ -50,7 +52,7 @@ class DecryptedVideo {
           key: key,
           index: index,
         );
-        out.writeSync(plaintext);
+        File(tempPath).writeAsBytesSync(plaintext, mode: FileMode.append);
       }
 
       return DecryptedVideoResult(tempPath: tempPath, header: header);
@@ -62,8 +64,6 @@ class DecryptedVideo {
         // Best-effort cleanup; ignore if the temp file is already gone.
       }
       rethrow;
-    } finally {
-      out.closeSync();
     }
   }
 }
