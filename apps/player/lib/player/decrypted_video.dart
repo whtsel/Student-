@@ -39,9 +39,11 @@ class DecryptedVideo {
     // Write plaintext to a temp file, chunk by chunk. This SDK's
     // RandomAccessFile lacks write(), so append each chunk via
     // File.writeAsBytesSync with FileMode.append (the approach the encrypter
-    // uses for its output stream).
-    final temp = Directory.systemTemp.createTempSync('cp-play-', extension: '.mp4');
-    final tempPath = temp.path;
+    // uses for its output stream). Directory.createTempSync returns a
+    // Directory (not a File) and takes no `extension`, so build a unique
+    // file path under the system temp dir directly.
+    final tempPath =
+        '${Directory.systemTemp.path}/cp-play-${DateTime.now().millisecondsSinceEpoch}.mp4';
     try {
       for (var index = 0; index < header.chunkCount; index++) {
         final plaintext = await _crypto.decryptChunk(
