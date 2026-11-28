@@ -28,49 +28,42 @@ class DecryptedVideo {
     String encPath,
     List<int> key,
   ) async {
-    final source = File(encPath);
-    final raf = source.openSync();
-    String? tempPath;
-    try {
-      // Read and validate the header first.
-      final headerBytes = raf.readSync(coursePackHeaderSize);
-      final header = _crypto.parseHeader(headerBytes);
+    // Read the whole encrypted file into memory. This SDK's RandomAccessFile
+    // lacks seek(), so we slice an in-memory copy for each chunk's readAt.
+    final allBytes = File(encPath).readAsBytesSync();
 
-      // Write plaintext to a temp file, chunk by chunk.
-      final temp = File.systemTemp.createTempSync('cp-play-', extension: '.mp4');
-      tempPath = temp.path;
-      final out = temp.openSync(mode: FileMode.write);
-      try {
-        for (var index = 0; index < header.chunkCount; index++) {
-          // Reuse the single open source file via seek/readSync.
-          final plaintext = await _crypto.decryptChunk(
-            readAt: (int offset, int length) async {
-              raf.seek(offset);
-              return raf.readSync(length);
-            },
-            header: header,
-            key: key,
-            index: index,
-          );
-          out.writeSync(plaintext);
-        }
-      } finally {
-        out.closeSync();
+    // Read and validate the header first.
+    final header =
+        _crypto.parseHeader(allBytes.sublist(0, coursePackHeaderSize));
+
+    // Write plaintext to a temp file, chunk by chunk.
+    final temp = Directory.systemTemp.createTempSync('cp-play-', extension: '.mp4');
+    final tempPath = temp.path;
+    final out = temp.openSync(mode: FileMode.write);
+    try {
+      for (var index = 0; index < header.chunkCount; index++) {
+        final plaintext = await _crypto.decryptChunk(
+          readAt: (int offset, int length) async {
+            return allBytes.sublist(offset, offset + length);
+          },
+          header: header,
+          key: key,
+          index: index,
+        );
+        out.writeSync(plaintext);
       }
 
       return DecryptedVideoResult(tempPath: tempPath, header: header);
     } on CoursePackError {
       // Clean up a partially-written temp file on failure.
-      if (tempPath != null) {
-        try {
-          File(tempPath).deleteSync();
-        } on FileSystemException {
-          // Best-effort cleanup; ignore if the temp file is already gone.
-        }
+      try {
+        File(tempPath).deleteSync();
+      } on FileSystemException {
+        // Best-effort cleanup; ignore if the temp file is already gone.
       }
       rethrow;
     } finally {
-      raf.closeSync();
+      out.closeSync();
     }
   }
 }

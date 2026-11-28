@@ -129,7 +129,7 @@ void main() {
     final pubB64 = CoursePackCrypto.encodeBase64(pub);
 
     // Tamper with the student name after signing.
-    final tampered = licText.replace('Ama Mensah', 'Someone Else');
+    final tampered = licText.replaceAll('Ama Mensah', 'Someone Else');
 
     await tester.pumpWidget(
       LicenceGateScreen(

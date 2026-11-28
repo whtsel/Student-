@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'licence/licence_gate_screen.dart';
-import 'player/course_screen.dart';
 
 /// The users app entry point.
 ///
 /// Routes:
 ///   * `/`        — the licence gate (device code + licence verification)
-///   * `/course`  — the course screen (lecture list + encrypted playback)
+///
+/// The course screen is pushed directly from the licence gate via a
+/// [MaterialPageRoute] once a licence is verified, so it needs no named
+/// route here.
 void main() => runApp(const CoursePackPlayerApp());
 
 class CoursePackPlayerApp extends StatelessWidget {
@@ -26,11 +28,6 @@ class CoursePackPlayerApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         LicenceGateScreen.routeName: (BuildContext context) =>
             const LicenceGateScreen(),
-        CourseScreen.routeName: (BuildContext context) {
-          final payload =
-              ModalRoute<void>.of(context)!.settings.arguments as Map;
-          return CourseScreen(payload: payload);
-        },
       },
     );
   }

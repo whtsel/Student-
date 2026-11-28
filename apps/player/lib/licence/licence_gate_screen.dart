@@ -7,6 +7,8 @@ import 'package:coursepack_licence/licence_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../player/course_screen.dart';
+
 /// The seller's Ed25519 public key, embedded in the app so licences can be
 /// verified offline. This is the PUBLIC key only — the private signing key
 /// never leaves the licence generator and is never embedded anywhere.
@@ -53,10 +55,8 @@ Future<String> _defaultReadComponents() =>
 class _LicenceGateScreenState extends State<LicenceGateScreen> {
   static const Color _bg = Color(0xFF0B0D12);
   static const Color _panel = Color(0xFF14171F);
-  static const Color _panelAlt = Color(0xFF1A1F29);
   static const Color _line = Color(0xFF2B3241);
   static const Color _muted = Color(0xFF8A93A8);
-  static const Color _text = Color(0xFFE9EDF6);
   static const Color _accent = Color(0xFF34D3B4);
   static const Color _danger = Color(0xFFFF8A8A);
 
@@ -174,7 +174,7 @@ class _LicenceGateScreenState extends State<LicenceGateScreen> {
                   const SizedBox(height: 12),
                   FilledButton.icon(
                     onPressed: _busy ? null : _pickLicence,
-                    icon: const Icon(Icons.license),
+                    icon: const Icon(Icons.verified_user),
                     label: const Text('Open licence (.lic)'),
                   ),
                   if (_status != null)
@@ -204,9 +204,10 @@ class _LicenceGateScreenState extends State<LicenceGateScreen> {
                 onPressed: () {
                   final payload = _checkResult!.payload;
                   if (payload != null) {
-                    Navigator.of(context).pushNamed(
-                      CourseScreen.routeName,
-                      arguments: payload,
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => CourseScreen(payload: payload),
+                      ),
                     );
                   }
                 },

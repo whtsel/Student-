@@ -37,11 +37,7 @@ class CourseScreen extends StatefulWidget {
 
 class _CourseScreenState extends State<CourseScreen> {
   static const Color _bg = Color(0xFF0B0D12);
-  static const Color _panel = Color(0xFF14171F);
-  static const Color _line = Color(0xFF2B3241);
   static const Color _muted = Color(0xFF8A93A8);
-  static const Color _accent = Color(0xFF34D3B4);
-  static const Color _danger = Color(0xFFFF8A8A);
 
   /// Per-lecture playback state: resolved `.enc` path, validation, and the
   /// current decrypted/playback session.

@@ -18,7 +18,7 @@ Future<String> writeEncFile(Uint8List plaintext, Uint8List key) async {
     fileNonce: fileNonce,
     fileId: fileId,
   );
-  final file = File.systemTemp.createTempSync('cp-enc-', extension: '.enc');
+  final file = Directory.systemTemp.createTempSync('cp-enc-', extension: '.enc');
   file.writeAsBytesSync(enc);
   return file.path;
 }
@@ -44,7 +44,7 @@ void main() {
 
     test('rejects a plain (non-CoursePack) file', () async {
       final file =
-          File.systemTemp.createTempSync('cp-plain-', extension: '.txt');
+          Directory.systemTemp.createTempSync('cp-plain-', extension: '.txt');
       file.writeAsBytesSync(Uint8List.fromList(plaintext.codeUnits));
       final result = CoursePackValidator().check(file.path);
       expect(result.ok, isFalse);
