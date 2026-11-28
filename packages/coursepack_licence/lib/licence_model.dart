@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 
-import '../crypto/course_pack_crypto.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
 import 'ed25519_keys.dart';
 
 /// One entry of `course_keys.json` — a lecture plus its content key.

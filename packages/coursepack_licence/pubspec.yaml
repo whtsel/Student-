@@ -1,0 +1,15 @@
+name: coursepack_licence
+description: CoursePack licence model — issue, check, sign and verify device-bound licences. Pure Dart, no Flutter.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  cryptography: ^2.7.0
+  coursepack_crypto:
+    path: ../coursepack_crypto
+
+dev_dependencies:
+  test: ^1.24.0

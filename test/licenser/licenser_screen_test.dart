@@ -1,4 +1,4 @@
-import 'package:coursepack/licenser/licenser_screen.dart';
+import 'package:coursepack_generator/licenser/licenser_screen.dart';
 import 'package:coursepack_file_io/coursepack_file_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

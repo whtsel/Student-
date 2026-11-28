@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:coursepack/crypto/course_pack_crypto.dart';
-import 'package:coursepack/licenser/ed25519_keys.dart';
-import 'package:coursepack/licenser/licence_model.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
+import 'package:coursepack_licence/ed25519_keys.dart';
+import 'package:coursepack_licence/licence_model.dart';
+import 'package:test/test.dart';
 
 /// The canonical JSON bytes Python produced for the reference licence payload,
 /// captured from `tools/make_licence.py`. The Dart canonical encoder must

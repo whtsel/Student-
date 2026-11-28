@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:coursepack_file_io/coursepack_file_io.dart';
 import 'package:flutter/material.dart';
 
-import '../crypto/course_pack_crypto.dart';
-import 'ed25519_keys.dart';
-import 'licence_model.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
+import 'package:coursepack_licence/ed25519_keys.dart';
+import 'package:coursepack_licence/licence_model.dart';
 
 /// The CoursePack licence generator: issue device-bound `.lic` files and check
 /// the ones you have already issued. Everything runs offline against the

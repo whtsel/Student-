@@ -1,0 +1,30 @@
+{
+  "payload": {
+    "v": 1,
+    "course_id": "88797A3E7D16D86C",
+    "course_title": "Statistics 201",
+    "lic_id": "LIC-8BC9CE",
+    "name": "Ama Mensah",
+    "phone": "0240000000",
+    "fp": "A1B2C3D4E5F67788",
+    "issued_at": "2026-11-27T03:16:37+00:00",
+    "expires_at": "2027-06-30",
+    "lectures": [
+      {
+        "id": "L01",
+        "title": "Welcome and course outline",
+        "file": "L01.enc",
+        "duration_s": 812.5,
+        "key": "AQIDBAUGBwgJCgsMDQ4PEA=="
+      },
+      {
+        "id": "L02",
+        "title": "What statistics actually is",
+        "file": "L02.enc",
+        "duration_s": 1264.0,
+        "key": "BAUGBwgJCgsMDQ4PEBISAVQ=="
+      }
+    ]
+  },
+  "sig": "Qer0t3JV0FpsMTtcWqx2Iz2eaU6yxbKQFz2taWOUPVoKUwF8dj7IS4DDqpPc5GtQlx102l5LxjTbzmAmDBoyAw=="
+}

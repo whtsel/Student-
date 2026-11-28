@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:coursepack/crypto/course_pack_crypto.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
+import 'package:test/test.dart';
 
 void main() {
   final crypto = CoursePackCrypto();

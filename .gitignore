@@ -27,6 +27,9 @@ licenses/
 !test/fixtures/*.enc
 !test/fixtures/*.lic
 !test/fixtures/*.b64
+!packages/*/test/fixtures/*.enc
+!packages/*/test/fixtures/*.lic
+!packages/*/test/fixtures/*.b64
 course_keys.json
 raw/
 dist/

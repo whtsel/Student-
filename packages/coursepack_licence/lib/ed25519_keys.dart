@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 
-import '../crypto/course_pack_crypto.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
 
 /// Raised when a signing key cannot be parsed or derived.
 class KeyImportException implements Exception {

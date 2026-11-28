@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:coursepack/crypto/course_pack_crypto.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
 import 'package:coursepack_device_identity/coursepack_device_identity.dart';
 
 class DeviceCodeScreen extends StatefulWidget {

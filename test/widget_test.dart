@@ -1,5 +1,5 @@
-import 'package:coursepack/crypto/course_pack_crypto.dart';
-import 'package:coursepack/licence/device_code_screen.dart';
+import 'package:coursepack_crypto/course_pack_crypto.dart';
+import 'package:coursepack_generator/licence/device_code_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
