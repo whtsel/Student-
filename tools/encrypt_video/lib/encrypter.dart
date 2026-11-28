@@ -218,36 +218,33 @@ class CourseEncrypter {
       chunkLog2: chunkLog2,
     );
 
-    // Open the output for writing. `RandomAccessFile.write` is async (it
-    // returns a Future), so we await each chunk as we encrypt it.
-    final outRaf = File(encPath).openSync(mode: FileMode.write);
+    // Write the header (this creates/truncates the output file), then
+    // stream each encrypted chunk by appending. `File.appendAsBytesSync`
+    // opens, writes and closes per call, which keeps memory bounded for
+    // large videos without relying on RandomAccessFile write methods.
+    File(encPath).writeAsBytesSync(header);
+
+    final chunkSize = 1 << chunkLog2;
+    final chunkCount =
+        plaintextSize == 0 ? 0 : (plaintextSize + chunkSize - 1) ~/ chunkSize;
+
+    final sourceRaf = source.openSync();
     try {
-      await outRaf.write(header);
-
-      final chunkSize = 1 << chunkLog2;
-      final chunkCount =
-          plaintextSize == 0 ? 0 : (plaintextSize + chunkSize - 1) ~/ chunkSize;
-
-      final sourceRaf = source.openSync();
-      try {
-        for (var index = 0; index < chunkCount; index++) {
-          final block = sourceRaf.readSync(chunkSize);
-          if (block.isEmpty) {
-            throw const CoursePackError('source truncated while reading');
-          }
-          final encrypted = await _crypto.encryptChunk(
-            plaintext: block,
-            key: key,
-            fileNonce: fileNonce,
-            index: index,
-          );
-          await outRaf.write(encrypted);
+      for (var index = 0; index < chunkCount; index++) {
+        final block = sourceRaf.readSync(chunkSize);
+        if (block.isEmpty) {
+          throw const CoursePackError('source truncated while reading');
         }
-      } finally {
-        sourceRaf.closeSync();
+        final encrypted = await _crypto.encryptChunk(
+          plaintext: block,
+          key: key,
+          fileNonce: fileNonce,
+          index: index,
+        );
+        File(encPath).appendAsBytesSync(encrypted);
       }
     } finally {
-      outRaf.closeSync();
+      sourceRaf.closeSync();
     }
 
     final encSize = File(encPath).lengthSync();
