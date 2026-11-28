@@ -166,7 +166,7 @@ jobs:
             # video_player requires minSdkVersion >= 24.
             sed -i -E 's/^([[:space:]]*)minSdkVersion[[:space:]]+.*/\1minSdkVersion 24/' android/app/build.gradle
             grep minSdkVersion android/app/build.gradle
-          } 2>&1 | tee player_diag.log
+          } 2>&1 | tee "$GITHUB_WORKSPACE/player_diag.log"
 
       - name: Push diagnostic log
         if: always()
