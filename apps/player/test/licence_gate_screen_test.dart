@@ -5,6 +5,7 @@ import 'package:coursepack_file_io/coursepack_file_io.dart';
 import 'package:coursepack_licence/ed25519_keys.dart';
 import 'package:coursepack_licence/licence_model.dart';
 import 'package:coursepack_player/licence/licence_gate_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// A [FileIo] that returns a fixed text payload (or null) without touching
