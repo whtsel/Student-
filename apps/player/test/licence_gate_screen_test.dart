@@ -105,6 +105,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Open licence (.lic)'));
+    await tester.pumpAndSettle();
+
     // The licence verifies; the "Open course" button should appear.
     expect(find.text('Open course'), findsOneWidget);
   });
@@ -123,6 +126,9 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Open licence (.lic)'));
     await tester.pumpAndSettle();
 
     // Fingerprint mismatch → no "Open course" button, and a rejection shown.
@@ -147,6 +153,9 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Open licence (.lic)'));
     await tester.pumpAndSettle();
 
     expect(find.text('Open course'), findsNothing);

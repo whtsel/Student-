@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Helper: encrypt [plaintext] with [key] and write it to a temp `.enc`
 /// file, returning the path.
-Future<String> writeEncFile(Uint8List plaintext, Uint8List key) async {
+Future<String> writeEncFile(List<int> plaintext, List<int> key) async {
   final crypto = CoursePackCrypto();
   final fileNonce = Uint8List.fromList(List<int>.generate(16, (_) => 0xAB));
   final fileId = Uint8List.fromList(List<int>.generate(16, (_) => 0x12));
@@ -34,7 +35,7 @@ void main() {
   group('CoursePackValidator', () {
     test('accepts a valid CoursePack .enc file', () async {
       final path = await writeEncFile(
-        Uint8List.fromList(plaintext.codeUnits),
+        utf8.encode(plaintext),
         key,
       );
       final result = CoursePackValidator().check(path);
@@ -46,7 +47,7 @@ void main() {
     test('rejects a plain (non-CoursePack) file', () async {
       final path =
           '${Directory.systemTemp.path}/cp-plain-${DateTime.now().millisecondsSinceEpoch}.txt';
-      File(path).writeAsBytesSync(Uint8List.fromList(plaintext.codeUnits));
+      File(path).writeAsBytesSync(utf8.encode(plaintext));
       final result = CoursePackValidator().check(path);
       expect(result.ok, isFalse);
       expect(result.message, contains('CoursePack'));
@@ -54,7 +55,7 @@ void main() {
 
     test('rejects a truncated file', () async {
       final path = await writeEncFile(
-        Uint8List.fromList(plaintext.codeUnits),
+        utf8.encode(plaintext),
         key,
       );
       final bytes = File(path).readAsBytesSync();
@@ -72,7 +73,7 @@ void main() {
   group('DecryptedVideo', () {
     test('decrypts a .enc file back to the original plaintext', () async {
       final encPath = await writeEncFile(
-        Uint8List.fromList(plaintext.codeUnits),
+        utf8.encode(plaintext),
         key,
       );
 
@@ -81,7 +82,7 @@ void main() {
 
       final decrypted = File(result.tempPath).readAsBytesSync();
       expect(
-        String.fromCharCodes(decrypted),
+        utf8.decode(decrypted),
         plaintext,
         reason: 'decrypted plaintext must match the original',
       );
@@ -94,7 +95,7 @@ void main() {
     test('throws CoursePackError when decrypting with the wrong key',
         () async {
       final encPath = await writeEncFile(
-        Uint8List.fromList(plaintext.codeUnits),
+        utf8.encode(plaintext),
         key,
       );
       final wrongKey =
@@ -111,7 +112,7 @@ void main() {
 
     test('cleans up the temp file when decryption fails', () async {
       final encPath = await writeEncFile(
-        Uint8List.fromList(plaintext.codeUnits),
+        utf8.encode(plaintext),
         key,
       );
       final wrongKey =
