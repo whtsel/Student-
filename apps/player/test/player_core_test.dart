@@ -10,8 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// file, returning the path.
 Future<String> writeEncFile(Uint8List plaintext, Uint8List key) async {
   final crypto = CoursePackCrypto();
-  final fileNonce = Uint8List.fromList(List<int>.generate(12, (_) => 0xAB));
-  final fileId = Uint8List.fromList(List<int>.generate(8, (_) => 0x12));
+  final fileNonce = Uint8List.fromList(List<int>.generate(16, (_) => 0xAB));
+  final fileId = Uint8List.fromList(List<int>.generate(16, (_) => 0x12));
   final enc = await crypto.encryptBytes(
     plaintext: plaintext,
     key: key,

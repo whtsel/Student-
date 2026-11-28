@@ -75,9 +75,11 @@ void main() {
     final rawFp = await _rawFpFor(components);
     final deviceCode = CoursePackCrypto.formatFingerprint(rawFp);
     await tester.pumpWidget(
-      LicenceGateScreen(
-        readComponents: () async => components,
-        sellerPublicKey: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      MaterialApp(
+        home: LicenceGateScreen(
+          readComponents: () async => components,
+          sellerPublicKey: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -92,10 +94,12 @@ void main() {
     final pubB64 = CoursePackCrypto.encodeBase64(pub);
 
     await tester.pumpWidget(
-      LicenceGateScreen(
-        readComponents: () async => components,
-        sellerPublicKey: pubB64,
-        fileIo: _FakeFileIo(text: licText),
+      MaterialApp(
+        home: LicenceGateScreen(
+          readComponents: () async => components,
+          sellerPublicKey: pubB64,
+          fileIo: _FakeFileIo(text: licText),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -110,10 +114,12 @@ void main() {
     final pubB64 = CoursePackCrypto.encodeBase64(pub);
 
     await tester.pumpWidget(
-      LicenceGateScreen(
-        readComponents: () async => components,
-        sellerPublicKey: pubB64,
-        fileIo: _FakeFileIo(text: licText),
+      MaterialApp(
+        home: LicenceGateScreen(
+          readComponents: () async => components,
+          sellerPublicKey: pubB64,
+          fileIo: _FakeFileIo(text: licText),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -132,10 +138,12 @@ void main() {
     final tampered = licText.replaceAll('Ama Mensah', 'Someone Else');
 
     await tester.pumpWidget(
-      LicenceGateScreen(
-        readComponents: () async => components,
-        sellerPublicKey: pubB64,
-        fileIo: _FakeFileIo(text: tampered),
+      MaterialApp(
+        home: LicenceGateScreen(
+          readComponents: () async => components,
+          sellerPublicKey: pubB64,
+          fileIo: _FakeFileIo(text: tampered),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -147,10 +155,12 @@ void main() {
   testWidgets('does nothing when the picker is cancelled',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      LicenceGateScreen(
-        readComponents: () async => components,
-        sellerPublicKey: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        fileIo: _FakeFileIo(text: null),
+      MaterialApp(
+        home: LicenceGateScreen(
+          readComponents: () async => components,
+          sellerPublicKey: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          fileIo: _FakeFileIo(text: null),
+        ),
       ),
     );
     await tester.pumpAndSettle();
