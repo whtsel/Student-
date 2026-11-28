@@ -4,6 +4,11 @@ name: Build CoursePack Licence Generator
 # The owner's machine cannot install Flutter or the Android SDK, so all
 # compilation happens here.
 #
+# The shared crypto and licence code lives in the pure-Dart packages under
+# packages/ and is tested in its own context (`dart test`/`dart analyze`
+# per package) because it has no Flutter dependency. The app's own widget
+# tests run under `flutter test` at the repo root.
+#
 # One-time setup for a signed release APK:
 #   Settings -> Secrets and variables -> Actions -> New repository secret:
 #     KEYSTORE_BASE64    base64 of your coursepack-keystore.jks
@@ -18,7 +23,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 # Expose the signing secrets as workflow-level env so their presence can be
 # tested in step `if:` conditions (the `secrets` context is not allowed
@@ -77,23 +82,22 @@ jobs:
       - name: Dependencies
         run: flutter pub get
 
-      - name: Analyse
-        shell: bash
+      - name: Package tests — coursepack_crypto
         run: |
-          set -o pipefail
-          flutter analyze --no-pub --no-fatal-infos 2>&1 | tee analyze.log
+          cd packages/coursepack_crypto
+          dart pub get
+          dart analyze
+          dart test
 
-      - name: Push analyse log (diagnostic)
-        if: always()
+      - name: Package tests — coursepack_licence
         run: |
-          git config user.name "ci-diag"
-          git config user.email "ci-diag@example.com"
-          git fetch origin arena/ab7e4a0b-student
-          git checkout -B ci-diag-log origin/arena/ab7e4a0b-student
-          cp analyze.log ./analyze.log 2>/dev/null || true
-          git add analyze.log 2>/dev/null || true
-          git commit -m "diag: analyse log" 2>/dev/null || true
-          git push --force origin HEAD:refs/heads/ci-diag-log 2>/dev/null || true
+          cd packages/coursepack_licence
+          dart pub get
+          dart analyze
+          dart test
+
+      - name: Analyse
+        run: flutter analyze --no-pub --no-fatal-infos
 
       - name: Test
         run: flutter test
